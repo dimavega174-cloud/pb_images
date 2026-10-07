@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pocket Battle</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+  html, body { margin: 0; height: 100%; background: #0e0e10; color: #8a8a92;
+               font: 15px -apple-system, system-ui, sans-serif; }
+  body { display: flex; align-items: center; justify-content: center; }
+</style>
+</head>
+<body>
+<div id="msg"></div>
+<script>
+// Pocket Battle: окно Telegram «Поделиться сообщением». Бот заранее готовит
+// сообщение (savePreparedInlineMessage) и передаёт его id в ссылке (?id=…&lang=…);
+// страница сразу открывает окно отправки и закрывается.
+(function () {
+  var tg = window.Telegram && window.Telegram.WebApp;
+  var p = new URLSearchParams(location.search);
+  var en = p.get("lang") === "en";
+  var T = {
+    old: en ? "Update Telegram to share from here." : "Обнови Telegram, чтобы делиться отсюда.",
+    expired: en ? "This button is outdated. Open the screen again and tap it once more."
+                : "Кнопка устарела. Открой экран заново и нажми ещё раз.",
+    fail: en ? "Couldn't open sharing. Try again." : "Не получилось открыть отправку. Попробуй ещё раз."
+  };
+  if (!tg) { document.getElementById("msg").textContent = T.old; return; }
+  tg.ready();
+  try { tg.setHeaderColor("#0e0e10"); tg.setBackgroundColor("#0e0e10"); } catch (e) {}
+  function close() { try { tg.close(); } catch (e) {} }
+  function alertClose(text) { try { tg.showAlert(text, close); } catch (e) { close(); } }
+  var id = p.get("id");
+  if (!id || typeof tg.shareMessage !== "function" || !tg.isVersionAtLeast || !tg.isVersionAtLeast("8.0")) {
+    alertClose(T.old); return;
+  }
+  tg.onEvent("shareMessageFailed", function (e) {
+    var err = e && e.error;
+    if (err === "USER_DECLINED") { close(); return; }
+    alertClose(err === "MESSAGE_EXPIRED" ? T.expired : T.fail);
+  });
+  tg.shareMessage(id, function () { close(); });
+})();
+</script>
+</body>
+</html>
