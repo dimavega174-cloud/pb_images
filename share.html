@@ -8,8 +8,9 @@
 <style>
   html, body { margin: 0; height: 100%; background: #0e0e10; color: #e9e6df;
                font: 17px/1.4 -apple-system, system-ui, "Segoe UI", sans-serif; }
-  body { display: flex; align-items: center; justify-content: center; text-align: center; }
-  #box { padding: 24px; max-width: 360px; }
+  /* текст — у самого верха: окно отправки Telegram выезжает снизу и закрывает середину */
+  body { display: flex; align-items: flex-start; justify-content: center; text-align: center; }
+  #box { padding: 20px 24px 0; max-width: 360px; }
   #big { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
   #small { color: #9a968d; font-size: 15px; }
 </style>
