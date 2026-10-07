@@ -41,7 +41,7 @@
     if (err === "USER_DECLINED") { close(); return; }
     alertClose(err === "MESSAGE_EXPIRED" ? T.expired : T.fail);
   });
-  tg.shareMessage(id, function () { close(); });
+  tg.shareMessage(id, function (sent) { if (sent) close(); });  // отказ/ошибка — через shareMessageFailed
 })();
 </script>
 </body>
