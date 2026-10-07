@@ -20,21 +20,25 @@
 <script>
 // Pocket Battle: окно Telegram «Поделиться сообщением». Бот заранее готовит
 // сообщение (savePreparedInlineMessage) и передаёт его id в ссылке:
-// ?id=…&lang=ru|en[&k=invite&b=1000&d=20&bot=имя_бота]
+// ?id=…&lang=ru|en[&k=invite&b=1000&d=20|&k=win][&bot=имя_бота]
 // k=invite — на фоне окна отправки бонус за друга, после отправки «✅ Отправлено»;
-// старый Telegram или ошибка — ссылка t.me/бот?start=invitecard: бот пришлёт
-// карточку-приглашение для пересылки, как раньше.
+// k=win — «🏆 Поделись победой», после отправки «✅ Отправлено!»;
+// старый Telegram или ошибка — ссылка t.me/бот?start=invitecard|wincard: бот
+// пришлёт карточку-приглашение / победу для пересылки.
 (function () {
   var tg = window.Telegram && window.Telegram.WebApp;
   var p = new URLSearchParams(location.search);
   var en = p.get("lang") === "en";
   var invite = p.get("k") === "invite";
+  var win = p.get("k") === "win";
   var bot = (p.get("bot") || "").replace(/[^A-Za-z0-9_]/g, "");
   function num(v) { return String(parseInt(v, 10) || 0).replace(/\B(?=(\d{3})+(?!\d))/g, en ? "," : " "); }
   var bonus = (en ? "🎁 For a friend: " : "🎁 За друга: ") + num(p.get("b")) + " 💵 + " + num(p.get("d")) + " 💎";
   var T = {
     pick: en ? "when they create a fighter" : "когда он создаст бойца",
     sent: en ? "✅ Invite sent!" : "✅ Приглашение отправлено!",
+    winTop: en ? "🏆 Share your victory with friends" : "🏆 Поделись победой с друзьями",
+    winSent: en ? "✅ Sent!" : "✅ Отправлено!",
     sentSmall: en ? "Your bonus arrives when your friend creates a fighter"
                   : "Бонус придёт, когда друг создаст бойца",
     old: en ? "Update Telegram to share from here." : "Обнови Telegram, чтобы делиться отсюда.",
@@ -47,14 +51,15 @@
     document.getElementById("small").textContent = small || "";
   }
   if (invite) show(bonus, T.pick);
+  if (win) show(T.winTop);
   if (!tg) { show(T.old); return; }
   tg.ready();
   try { tg.expand(); tg.setHeaderColor("#0e0e10"); tg.setBackgroundColor("#0e0e10"); } catch (e) {}
   function close() { try { tg.close(); } catch (e) {} }
   function fallback(text) {
     // приглашение: бот пришлёт карточку для пересылки; иначе — просто сообщение
-    if (invite && bot && tg.openTelegramLink) {
-      try { tg.openTelegramLink("https://t.me/" + bot + "?start=invitecard"); } catch (e) {}
+    if ((invite || win) && bot && tg.openTelegramLink) {
+      try { tg.openTelegramLink("https://t.me/" + bot + "?start=" + (invite ? "invitecard" : "wincard")); } catch (e) {}
       setTimeout(close, 300);
       return;
     }
@@ -72,6 +77,7 @@
   tg.shareMessage(id, function (sent) {
     if (!sent) return;  // отказ/ошибка — через shareMessageFailed
     if (invite) { show(T.sent, T.sentSmall); setTimeout(close, 1500); }
+    else if (win) { show(T.winSent); setTimeout(close, 1200); }
     else close();
   });
 })();
