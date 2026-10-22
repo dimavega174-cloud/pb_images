@@ -33,14 +33,14 @@
   var win = p.get("k") === "win";
   var bot = (p.get("bot") || "").replace(/[^A-Za-z0-9_]/g, "");
   function num(v) { return String(parseInt(v, 10) || 0).replace(/\B(?=(\d{3})+(?!\d))/g, en ? "," : " "); }
-  var bonus = (en ? "🎁 For a friend: " : "🎁 За друга: ") + num(p.get("b")) + " 💵 + " + num(p.get("d")) + " 💎";
+  var bonus = (en ? "🎁 Bonus: " : "🎁 Бонус: ") + num(p.get("b")) + " 💵 + " + num(p.get("d")) + " 💎";
   var T = {
-    pick: en ? "when they create a fighter" : "когда он создаст бойца",
+    pick: en ? "For every new player" : "За каждого нового игрока",
     sent: en ? "✅ Invite sent!" : "✅ Приглашение отправлено!",
     winTop: en ? "🏆 Share your victory with friends" : "🏆 Поделись победой с друзьями",
     winSent: en ? "✅ Sent!" : "✅ Отправлено!",
-    sentSmall: en ? "Your bonus arrives when your friend creates a fighter"
-                  : "Бонус придёт, когда друг создаст бойца",
+    sentSmall: en ? "Bonus — for every new player"
+                  : "Бонус — за каждого нового игрока",
     old: en ? "Update Telegram to share from here." : "Обнови Telegram, чтобы делиться отсюда.",
     expired: en ? "This button is outdated. Open the screen again and tap it once more."
                 : "Кнопка устарела. Открой экран заново и нажми ещё раз.",
